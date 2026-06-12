@@ -32,7 +32,7 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${pageId}/posts`;
       const params = nextUrl ? undefined : {
         access_token: pageToken,
-        fields: 'id,message,permalink_url,full_picture,source,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
+        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
         limit: 10
       };
 
