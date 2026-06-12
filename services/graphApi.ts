@@ -94,7 +94,7 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${igAccountId}/media`;
       const params = nextUrl ? undefined : {
         access_token: userToken,
-        fields: 'id,username,caption,permalink,media_type,media_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
+        fields: 'id,username,caption,permalink,media_type,media_url,thumbnail_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
         limit: 10
       };
 
@@ -122,7 +122,7 @@ export const socialMediaGraphService = {
               accountName: pageName,
               postText: media.caption || 'Instagram Post',
               postLink: media.permalink || `https://instagram.com/p/${media.id}`,
-              postImage: media.media_type !== 'VIDEO' ? (media.media_url || '') : '',
+              postImage: media.media_type !== 'VIDEO' ? (media.media_url || '') : (media.thumbnail_url || ''),
               postVideo: media.media_type === 'VIDEO' ? media.media_url : undefined,
               postMetrics: { likes: media.like_count || 0, comments: media.comments_count || 0 }
             });

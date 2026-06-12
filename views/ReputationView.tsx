@@ -520,7 +520,7 @@ const ReputationView: React.FC = () => {
                <div className="p-5 max-h-[70vh] overflow-y-auto">
                   {selectedPost.postVideo ? (
                      <div className="w-full h-48 rounded-xl overflow-hidden mb-4 bg-slate-900 border border-slate-200 shadow-sm flex items-center justify-center">
-                        <video src={selectedPost.postVideo} controls className="w-full h-full object-contain" />
+                        <video src={selectedPost.postVideo} controls playsInline autoPlay muted preload="auto" className="w-full h-full object-contain" />
                      </div>
                   ) : selectedPost.postImage ? (
                      <div className="w-full h-48 rounded-xl overflow-hidden mb-4 bg-slate-100 border border-slate-200 shadow-sm">
