@@ -32,7 +32,7 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${pageId}/posts`;
       const params = nextUrl ? undefined : {
         access_token: pageToken,
-        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,created_time,from{name,id}}',
+        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
         limit: 10
       };
 
@@ -57,6 +57,7 @@ export const socialMediaGraphService = {
               source: 'Facebook',
               date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(c.created_time)),
               content: c.message || '',
+              commentImage: c.attachment?.media?.image?.src || null,
               status: 'Pending',
               sentiment: 'Neutral',
               topics: ['Social Media'],

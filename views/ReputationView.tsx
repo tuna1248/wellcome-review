@@ -39,6 +39,7 @@ export interface Review {
   source: 'Facebook' | 'Meta' | string;
   date: string;
   content: string;
+  commentImage?: string;
   status: 'Replied' | 'Pending' | 'Escalated' | 'Flagged';
   reply?: string;
   sentiment: 'Positive' | 'Neutral' | 'Negative';
@@ -314,10 +315,15 @@ const ReputationView: React.FC = () => {
                           </div>
                        </div>
 
-                       <div className="pl-[52px]">
-                          <p className="text-sm text-slate-700 leading-relaxed mb-3">"{review.content}"</p>
-                          
-                          <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="pl-[52px]">
+                           {review.content && <p className="text-sm text-slate-700 leading-relaxed mb-3">"{review.content}"</p>}
+                           {review.commentImage && (
+                              <div className="mb-3">
+                                 <img src={review.commentImage} alt="Comment Attachment" className="max-w-[150px] rounded-lg border border-slate-200" />
+                              </div>
+                           )}
+                           
+                           <div className="flex flex-wrap gap-2 mb-4">
                              {review.postText && (
                                 <button onClick={() => setSelectedPost(review)} className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200 flex items-center gap-1 hover:bg-slate-200 transition-colors">
                                    <MessageCircle size={10}/> Post: {review.postText.length > 25 ? review.postText.substring(0, 25) + '...' : review.postText}
