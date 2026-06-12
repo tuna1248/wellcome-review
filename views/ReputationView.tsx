@@ -49,6 +49,7 @@ export interface Review {
   postText?: string;
   postLink?: string;
   postImage?: string;
+  postVideo?: string;
   postMetrics?: { likes: number, comments: number, shares?: number };
   accountName?: string;
   procedure?: string;
@@ -517,11 +518,15 @@ const ReputationView: React.FC = () => {
                   </button>
                </div>
                <div className="p-5 max-h-[70vh] overflow-y-auto">
-                  {selectedPost.postImage && (
+                  {selectedPost.postVideo ? (
+                     <div className="w-full h-48 rounded-xl overflow-hidden mb-4 bg-slate-900 border border-slate-200 shadow-sm flex items-center justify-center">
+                        <video src={selectedPost.postVideo} controls className="w-full h-full object-contain" />
+                     </div>
+                  ) : selectedPost.postImage ? (
                      <div className="w-full h-48 rounded-xl overflow-hidden mb-4 bg-slate-100 border border-slate-200 shadow-sm">
                         <img src={selectedPost.postImage} alt="Post" className="w-full h-full object-cover" />
                      </div>
-                  )}
+                  ) : null}
                   <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{selectedPost.postText}</p>
                   
                   {selectedPost.postMetrics && (
