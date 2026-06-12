@@ -66,6 +66,8 @@ const ReputationView: React.FC = () => {
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   
   // Facebook/Meta API State
   const [metaToken, setMetaToken] = useState('');
@@ -146,11 +148,33 @@ const ReputationView: React.FC = () => {
         const newComments = fetchedComments.filter(c => !existingIds.has(c.id));
         return [...newComments, ...prev];
       });
-      
+      setHasMore(socialMediaGraphService.hasMoreComments());
     } catch (err: any) {
       setSyncError(err.message || "Meta yorumları çekilirken hata oluştu.");
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (!metaToken.trim() || !hasMore) return;
+    
+    setSyncError(null);
+    setIsLoadingMore(true);
+    
+    try {
+      const fetchedComments = await socialMediaGraphService.loadMoreCommentsAsReviews(metaToken);
+      
+      setReviews(prev => {
+        const existingIds = new Set(prev.map(r => r.id));
+        const newComments = fetchedComments.filter(c => !existingIds.has(c.id));
+        return [...prev, ...newComments];
+      });
+      setHasMore(socialMediaGraphService.hasMoreComments());
+    } catch (err: any) {
+      setSyncError(err.message || "Daha fazla yorum çekilirken hata oluştu.");
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -180,26 +204,6 @@ const ReputationView: React.FC = () => {
               Reputation Command Center
             </h2>
             <p className="text-slate-500 text-sm mt-1">Monitor sentiment, manage reviews, and analyze patient feedback across all channels.</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-             <div className="relative">
-               <Key size={14} className="absolute left-3 top-3 text-slate-400" />
-               <input 
-                 type="text" 
-                 placeholder="Meta Access Token..."
-                 value={metaToken}
-                 onChange={(e) => setMetaToken(e.target.value)}
-                 className="pl-8 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-64 shadow-sm"
-               />
-             </div>
-             <button 
-               onClick={handleSync}
-               disabled={isSyncing}
-               className="flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all transform active:scale-95 disabled:opacity-50"
-             >
-                {isSyncing ? <RefreshCw size={18} className="animate-spin" /> : <Share2 size={18} />} 
-                {isSyncing ? 'Syncing...' : 'Get More Reviews'}
-             </button>
           </div>
         </div>
         {syncError && <div className="text-red-500 text-xs font-bold bg-red-50 p-3 rounded-xl border border-red-100 shadow-sm">{syncError}</div>}
@@ -469,6 +473,19 @@ const ReputationView: React.FC = () => {
                        <Users size={48} className="mx-auto mb-4 text-slate-200" />
                        <p className="text-slate-500 font-medium">No reviews found. Try syncing Meta data.</p>
                        <button onClick={() => { setFilterStatus('All'); setFilterSource('All'); setSearchQuery(''); }} className="mt-2 text-emerald-600 text-sm font-bold hover:underline">Clear Filters</button>
+                    </div>
+                 )}
+
+                 {hasMore && filteredReviews.length > 0 && (
+                    <div className="flex justify-center mt-6">
+                       <button 
+                          onClick={handleLoadMore}
+                          disabled={isLoadingMore}
+                          className="px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+                       >
+                          {isLoadingMore ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                          {isLoadingMore ? 'Yükleniyor...' : 'Daha Fazla Yükle'}
+                       </button>
                     </div>
                  )}
               </div>
