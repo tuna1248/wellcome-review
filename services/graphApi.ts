@@ -137,31 +137,36 @@ export const socialMediaGraphService = {
     // Reset cursors on initial fetch
     socialMediaGraphService.cursors = { fb: {}, ig: {} };
     const pages = await socialMediaGraphService.getPages(userToken);
-    let allReviews: any[] = [];
-
-    for (const page of pages) {
+    
+    const promises = pages.map(async (page) => {
+      let pageReviews: any[] = [];
+      // Fetch FB Comments
       const fbComments = await socialMediaGraphService.getFacebookComments(page.id, page.access_token, page.name);
-      allReviews = [...allReviews, ...fbComments];
+      pageReviews = [...pageReviews, ...fbComments];
 
+      // Fetch IG Comments (first get account ID)
       const igAccountId = await socialMediaGraphService.getInstagramAccountId(page.id, page.access_token);
       if (igAccountId) {
         const igComments = await socialMediaGraphService.getInstagramComments(igAccountId, userToken, page.name);
-        allReviews = [...allReviews, ...igComments];
+        pageReviews = [...pageReviews, ...igComments];
       }
-    }
+      return pageReviews;
+    });
 
-    return allReviews;
+    const results = await Promise.all(promises);
+    return results.flat();
   },
 
   loadMoreCommentsAsReviews: async (userToken: string): Promise<any[]> => {
     const pages = await socialMediaGraphService.getPages(userToken);
-    let allReviews: any[] = [];
-
-    for (const page of pages) {
+    
+    const promises = pages.map(async (page) => {
+      let pageReviews: any[] = [];
+      
       const fbNextUrl = socialMediaGraphService.cursors.fb[page.id];
       if (fbNextUrl) {
         const fbComments = await socialMediaGraphService.getFacebookComments(page.id, page.access_token, page.name, fbNextUrl);
-        allReviews = [...allReviews, ...fbComments];
+        pageReviews = [...pageReviews, ...fbComments];
       }
 
       const igAccountId = await socialMediaGraphService.getInstagramAccountId(page.id, page.access_token);
@@ -169,12 +174,14 @@ export const socialMediaGraphService = {
         const igNextUrl = socialMediaGraphService.cursors.ig[igAccountId];
         if (igNextUrl) {
           const igComments = await socialMediaGraphService.getInstagramComments(igAccountId, userToken, page.name, igNextUrl);
-          allReviews = [...allReviews, ...igComments];
+          pageReviews = [...pageReviews, ...igComments];
         }
       }
-    }
+      return pageReviews;
+    });
 
-    return allReviews;
+    const results = await Promise.all(promises);
+    return results.flat();
   },
 
   hasMoreComments: (): boolean => {
