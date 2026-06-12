@@ -32,8 +32,8 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${pageId}/posts`;
       const params = nextUrl ? undefined : {
         access_token: pageToken,
-        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(20){id,message,created_time,from{name,id}}',
-        limit: 5
+        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,created_time,from{name,id}}',
+        limit: 10
       };
 
       const response = await axios.get(url, { params });
@@ -92,8 +92,8 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${igAccountId}/media`;
       const params = nextUrl ? undefined : {
         access_token: userToken,
-        fields: 'id,username,caption,permalink,media_url,like_count,comments_count,comments.limit(20){id,text,timestamp,username}',
-        limit: 5
+        fields: 'id,username,caption,permalink,media_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
+        limit: 10
       };
 
       const response = await axios.get(url, { params });
