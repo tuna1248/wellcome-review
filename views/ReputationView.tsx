@@ -478,34 +478,6 @@ const ReputationView: React.FC = () => {
               
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                  <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <BrainCircuit size={18} className="text-purple-500"/> Topic Analysis
-                 </h3>
-                 <div className="flex flex-wrap gap-2">
-                    {[
-                       { label: 'Social Media', val: 92, type: 'pos' },
-                       { label: 'Engagement', val: 88, type: 'pos' },
-                       { label: 'Inquiries', val: 60, type: 'neu' },
-                       { label: 'Complaints', val: 12, type: 'neg' },
-                    ].map(topic => (
-                       <div 
-                          key={topic.label} 
-                          className={`px-3 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-2 ${
-                             topic.type === 'pos' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                             topic.type === 'neg' ? 'bg-red-50 text-red-700 border-red-100' :
-                             'bg-slate-50 text-slate-700 border-slate-200'
-                          }`}
-                       >
-                          {topic.label}
-                          <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                             topic.type === 'pos' ? 'bg-emerald-200/50' : topic.type === 'neg' ? 'bg-red-200/50' : 'bg-slate-200'
-                          }`}>{topic.val}%</span>
-                       </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                 <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <BarChart3 size={18} className="text-blue-500"/> Source Breakdown
                  </h3>
                  <div className="space-y-4">
