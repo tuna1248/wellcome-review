@@ -208,63 +208,6 @@ const ReputationView: React.FC = () => {
         </div>
         {syncError && <div className="text-red-500 text-xs font-bold bg-red-50 p-3 rounded-xl border border-red-100 shadow-sm">{syncError}</div>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5"><Star size={80} /></div>
-              <div className="flex justify-between items-start mb-2">
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Overall Rating</p>
-                 <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-100">+0.0 vs last mo</span>
-              </div>
-              <div className="flex items-end gap-3">
-                 <h3 className="text-3xl font-bold text-slate-800">{averageRating}</h3>
-                 <div className="flex text-amber-400 mb-1.5">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} fill={i <= Math.round(parseFloat(averageRating)) ? "currentColor" : "none"} className={i > Math.round(parseFloat(averageRating)) ? "text-slate-200" : ""} />)}
-                 </div>
-              </div>
-              <p className="text-xs text-slate-500 mt-2">{totalReviews} total reviews</p>
-           </div>
-
-           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5"><ThumbsUp size={80} /></div>
-              <div className="flex justify-between items-start mb-2">
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Net Promoter Score</p>
-                 <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-100">Top 10%</span>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-800">{npsScore}</h3>
-              <div className="w-full h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
-                 <div className="h-full bg-gradient-to-r from-red-400 via-yellow-400 to-emerald-500" style={{ width: `${npsScore}%` }}></div>
-              </div>
-           </div>
-
-           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5"><AlertCircle size={80} /></div>
-              <div className="flex justify-between items-start mb-2">
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Needs Attention</p>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-800">{pendingCount}</h3>
-              <p className="text-xs text-slate-500 mt-2">Reviews pending response</p>
-              <div className="mt-3 flex gap-2">
-                 {reviews.filter(r => r.status === 'Escalated').length > 0 && (
-                    <span className="text-[10px] font-bold bg-red-50 text-red-600 px-2 py-1 rounded border border-red-100 flex items-center gap-1">
-                       <AlertCircle size={10}/> {reviews.filter(r => r.status === 'Escalated').length} Escalated
-                    </span>
-                 )}
-              </div>
-           </div>
-
-           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5"><TrendingUp size={80} /></div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Sentiment Trend</p>
-              <div className="flex items-end gap-2 h-16 mt-2">
-                 {[60, 65, 55, 70, 75, 82, 85].map((h, i) => (
-                    <div key={i} className="flex-1 bg-emerald-100 rounded-t-sm relative group">
-                       <div className="absolute bottom-0 left-0 right-0 bg-emerald-500 rounded-t-sm transition-all duration-500" style={{ height: `${h}%` }}></div>
-                    </div>
-                 ))}
-              </div>
-              <p className="text-xs text-emerald-600 font-bold mt-2 text-center">Positive Trend (+5%)</p>
-           </div>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
            
@@ -313,8 +256,25 @@ const ReputationView: React.FC = () => {
                  </div>
               </div>
 
-              <div className="space-y-4">
-                 {filteredReviews.map(review => (
+               <div className="space-y-4">
+                  {isSyncing ? (
+                     Array.from({length: 3}).map((_, idx) => (
+                        <div key={idx} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 animate-pulse">
+                           <div className="flex items-start gap-3 mb-3">
+                              <div className="w-10 h-10 rounded-full bg-slate-200"></div>
+                              <div className="flex-1">
+                                 <div className="h-4 bg-slate-200 rounded w-1/4 mb-2"></div>
+                                 <div className="h-3 bg-slate-200 rounded w-1/3"></div>
+                              </div>
+                           </div>
+                           <div className="pl-[52px] space-y-2 mt-4">
+                              <div className="h-3 bg-slate-200 rounded w-full"></div>
+                              <div className="h-3 bg-slate-200 rounded w-5/6"></div>
+                              <div className="h-3 bg-slate-200 rounded w-4/6"></div>
+                           </div>
+                        </div>
+                     ))
+                  ) : filteredReviews.map(review => (
                     <div key={review.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:border-emerald-200 transition-all group">
                        <div className="flex justify-between items-start mb-3">
                           <div className="flex items-center gap-3">
@@ -468,7 +428,7 @@ const ReputationView: React.FC = () => {
                     </div>
                  ))}
                  
-                 {filteredReviews.length === 0 && (
+                 {!isSyncing && filteredReviews.length === 0 && (
                     <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
                        <Users size={48} className="mx-auto mb-4 text-slate-200" />
                        <p className="text-slate-500 font-medium">No reviews found. Try syncing Meta data.</p>
