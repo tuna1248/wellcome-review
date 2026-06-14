@@ -33,7 +33,7 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${pageId}/posts`;
       const params = nextUrl ? undefined : {
         access_token: pageToken,
-        fields: 'id,message,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
+        fields: 'id,message,created_time,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
         limit: 10
       };
 
@@ -45,11 +45,11 @@ export const socialMediaGraphService = {
 
       let allComments: any[] = [];
       response.data.data.forEach((post: any) => {
-        if (post.comments && post.comments.data) {
-          const likesCount = post.likes?.summary?.total_count || 0;
-          const commentsCount = post.comments?.summary?.total_count || 0;
-          const sharesCount = post.shares?.count || 0;
+        const likesCount = post.likes?.summary?.total_count || 0;
+        const commentsCount = post.comments?.summary?.total_count || 0;
+        const sharesCount = post.shares?.count || 0;
 
+        if (post.comments && post.comments.data && post.comments.data.length > 0) {
           post.comments.data.forEach((c: any) => {
             allComments.push({
               id: c.id,
@@ -70,6 +70,26 @@ export const socialMediaGraphService = {
               postVideo: post.source || undefined,
               postMetrics: { likes: likesCount, comments: commentsCount, shares: sharesCount }
             });
+          });
+        } else {
+          // Eğer yorum yoksa postun kendisini ekleyelim ki ekranda görünsün
+          allComments.push({
+            id: post.id,
+            author: pageName,
+            patientType: 'Anonymous',
+            rating: 5,
+            source: 'Facebook',
+            date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(post.created_time || Date.now())),
+            content: post.message ? `[Gönderi] ${post.message}` : '[Görsel/Video Gönderisi]', // Post metnini içerik olarak göster
+            status: 'Replied', // Bekleyen bir işlem olmadığı için Replied olarak işaretleyelim
+            sentiment: 'Neutral',
+            topics: ['Social Media'],
+            accountName: pageName,
+            postText: post.message || 'Facebook Post',
+            postLink: post.permalink_url || `https://facebook.com/${post.id}`,
+            postImage: post.full_picture || '',
+            postVideo: post.source || undefined,
+            postMetrics: { likes: likesCount, comments: commentsCount, shares: sharesCount }
           });
         }
       });
@@ -97,7 +117,7 @@ export const socialMediaGraphService = {
       const url = nextUrl || `${GRAPH_API_BASE_URL}/${igAccountId}/media`;
       const params = nextUrl ? undefined : {
         access_token: userToken,
-        fields: 'id,username,caption,permalink,media_type,media_url,thumbnail_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
+        fields: 'id,username,caption,timestamp,permalink,media_type,media_url,thumbnail_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
         limit: 10
       };
 
@@ -110,7 +130,7 @@ export const socialMediaGraphService = {
       let allComments: any[] = [];
       response.data.data.forEach((media: any) => {
         const pageName = media.username || fallbackName;
-        if (media.comments && media.comments.data) {
+        if (media.comments && media.comments.data && media.comments.data.length > 0) {
           media.comments.data.forEach((c: any) => {
             allComments.push({
               id: c.id,
@@ -130,6 +150,25 @@ export const socialMediaGraphService = {
               postVideo: media.media_type === 'VIDEO' ? media.media_url : undefined,
               postMetrics: { likes: media.like_count || 0, comments: media.comments_count || 0 }
             });
+          });
+        } else {
+          allComments.push({
+            id: media.id,
+            author: pageName,
+            patientType: 'Anonymous',
+            rating: 5,
+            source: 'Instagram',
+            date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(media.timestamp || Date.now())),
+            content: media.caption ? `[Gönderi] ${media.caption}` : '[Görsel/Video Gönderisi]',
+            status: 'Replied', // Bekleyen işlem yok
+            sentiment: 'Neutral',
+            topics: ['Social Media'],
+            accountName: pageName,
+            postText: media.caption || 'Instagram Post',
+            postLink: media.permalink || `https://instagram.com/p/${media.id}`,
+            postImage: media.media_type !== 'VIDEO' ? (media.media_url || '') : (media.thumbnail_url || ''),
+            postVideo: media.media_type === 'VIDEO' ? media.media_url : undefined,
+            postMetrics: { likes: media.like_count || 0, comments: media.comments_count || 0 }
           });
         }
       });
