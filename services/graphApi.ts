@@ -34,7 +34,7 @@ export const socialMediaGraphService = {
       const params = nextUrl ? undefined : {
         access_token: pageToken,
         fields: 'id,message,created_time,permalink_url,full_picture,likes.summary(true).limit(0),shares,comments.summary(true).limit(10){id,message,attachment,created_time,from{name,id}}',
-        limit: 10
+        limit: 50
       };
 
       const response = await axios.get(url, { params });
@@ -71,26 +71,6 @@ export const socialMediaGraphService = {
               postMetrics: { likes: likesCount, comments: commentsCount, shares: sharesCount }
             });
           });
-        } else {
-          // Eğer yorum yoksa postun kendisini ekleyelim ki ekranda görünsün
-          allComments.push({
-            id: post.id,
-            author: pageName,
-            patientType: 'Anonymous',
-            rating: 5,
-            source: 'Facebook',
-            date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(post.created_time || Date.now())),
-            content: post.message || '',
-            status: 'Replied', // Bekleyen bir işlem olmadığı için Replied olarak işaretleyelim
-            sentiment: 'Neutral',
-            topics: ['Social Media'],
-            accountName: pageName,
-            postText: post.message || 'Facebook Post',
-            postLink: post.permalink_url || `https://facebook.com/${post.id}`,
-            postImage: post.full_picture || '',
-            postVideo: post.source || undefined,
-            postMetrics: { likes: likesCount, comments: commentsCount, shares: sharesCount }
-          });
         }
       });
       return allComments;
@@ -118,7 +98,7 @@ export const socialMediaGraphService = {
       const params = nextUrl ? undefined : {
         access_token: userToken,
         fields: 'id,username,caption,timestamp,permalink,media_type,media_url,thumbnail_url,like_count,comments_count,comments.limit(10){id,text,timestamp,username}',
-        limit: 10
+        limit: 50
       };
 
       const response = await axios.get(url, { params });
@@ -150,25 +130,6 @@ export const socialMediaGraphService = {
               postVideo: media.media_type === 'VIDEO' ? media.media_url : undefined,
               postMetrics: { likes: media.like_count || 0, comments: media.comments_count || 0 }
             });
-          });
-        } else {
-          allComments.push({
-            id: media.id,
-            author: pageName,
-            patientType: 'Anonymous',
-            rating: 5,
-            source: 'Instagram',
-            date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(media.timestamp || Date.now())),
-            content: media.caption || '',
-            status: 'Replied', // Bekleyen işlem yok
-            sentiment: 'Neutral',
-            topics: ['Social Media'],
-            accountName: pageName,
-            postText: media.caption || 'Instagram Post',
-            postLink: media.permalink || `https://instagram.com/p/${media.id}`,
-            postImage: media.media_type !== 'VIDEO' ? (media.media_url || '') : (media.thumbnail_url || ''),
-            postVideo: media.media_type === 'VIDEO' ? media.media_url : undefined,
-            postMetrics: { likes: media.like_count || 0, comments: media.comments_count || 0 }
           });
         }
       });
