@@ -20,6 +20,7 @@ export const socialMediaGraphService = {
       const response = await axios.get(`${GRAPH_API_BASE_URL}/me/accounts`, {
         params: { access_token: userToken },
       });
+      console.log('Meta Graph API - getPages response:', response.data);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching pages:', error);
@@ -37,6 +38,7 @@ export const socialMediaGraphService = {
       };
 
       const response = await axios.get(url, { params });
+      console.log(`Meta Graph API - getFacebookComments response for ${pageId}:`, response.data);
       
       // Update cursor
       socialMediaGraphService.cursors.fb[pageId] = response.data.paging?.next || null;
@@ -83,6 +85,7 @@ export const socialMediaGraphService = {
       const response = await axios.get(`${GRAPH_API_BASE_URL}/${pageId}`, {
         params: { access_token: pageToken, fields: 'instagram_business_account' },
       });
+      console.log(`Meta Graph API - getInstagramAccountId response for ${pageId}:`, response.data);
       return response.data.instagram_business_account?.id || null;
     } catch (error) {
       return null;
@@ -99,6 +102,7 @@ export const socialMediaGraphService = {
       };
 
       const response = await axios.get(url, { params });
+      console.log(`Meta Graph API - getInstagramComments response for ${igAccountId}:`, response.data);
       
       // Update cursor
       socialMediaGraphService.cursors.ig[igAccountId] = response.data.paging?.next || null;
