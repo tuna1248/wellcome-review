@@ -80,7 +80,7 @@ export const socialMediaGraphService = {
             rating: 5,
             source: 'Facebook',
             date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(post.created_time || Date.now())),
-            content: post.message ? `[Gönderi] ${post.message}` : '[Görsel/Video Gönderisi]', // Post metnini içerik olarak göster
+            content: post.message || '',
             status: 'Replied', // Bekleyen bir işlem olmadığı için Replied olarak işaretleyelim
             sentiment: 'Neutral',
             topics: ['Social Media'],
@@ -159,7 +159,7 @@ export const socialMediaGraphService = {
             rating: 5,
             source: 'Instagram',
             date: new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(media.timestamp || Date.now())),
-            content: media.caption ? `[Gönderi] ${media.caption}` : '[Görsel/Video Gönderisi]',
+            content: media.caption || '',
             status: 'Replied', // Bekleyen işlem yok
             sentiment: 'Neutral',
             topics: ['Social Media'],
